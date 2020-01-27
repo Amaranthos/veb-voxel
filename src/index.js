@@ -1,4 +1,5 @@
 import { vertex, fragment, createProgram, createShader } from "./shaders/";
+import { m3 } from "./matrices";
 
 const resizeCanvas = canvas => {
   const { clientWidth, clientHeight } = canvas;
@@ -32,38 +33,35 @@ const drawScene = (
   program,
   vao,
   positionBuffer,
-  {
-    resolutionLocation,
-    colourLocation,
-    translationLocation,
-    rotationLocation,
-    scaledLocation
-  },
-  { translation, rotation, scale, width, height, colour }
+  { resolutionLocation, colourLocation, matrixLocation },
+  { translation, scaling, width, height, colour }
 ) => {
   resizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   gl.useProgram(program);
 
   gl.bindVertexArray(vao);
+  setRectangle(gl, 0, 0, width, height);
 
   gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  setRectangle(gl, 0, 0, width, height);
+
+  const origin = m3.translation(-width / 2, -height / 2);
+  const translate = m3.translation(...translation);
+  const rotate = m3.rotation(angle);
+  const scale = m3.scaling(...scaling);
+
+  let matrix = m3.multiply(translate, rotate);
+  matrix = m3.multiply(matrix, scale);
+  matrix = m3.multiply(matrix, origin);
+
+  gl.uniformMatrix3fv(matrixLocation, false, matrix);
 
   gl.uniform4fv(colourLocation, colour);
-
-  gl.uniform2fv(translationLocation, translation);
-
-  gl.uniform2fv(rotationLocation, rotation);
-
-  gl.uniform2fv(scaledLocation, scale);
-
-  // gl.uniform2fv(scaledLocation, scale);
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 };
@@ -71,9 +69,9 @@ const drawScene = (
 // main
 
 let translation = [0, 0];
-let rotation = [0, 1];
+let degrees = 0;
+let scaling = [1, 1];
 let angle = 0;
-let scale = [1, 1];
 const width = 100;
 const height = 30;
 const colour = [Math.random(), Math.random(), Math.random(), 1];
@@ -92,9 +90,7 @@ const colour = [Math.random(), Math.random(), Math.random(), 1];
   const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
   const colourLocation = gl.getUniformLocation(program, "u_colour");
   const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-  const translationLocation = gl.getUniformLocation(program, "u_translation");
-  const rotationLocation = gl.getUniformLocation(program, "u_rotation");
-  const scaledLocation = gl.getUniformLocation(program, "u_scale");
+  const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
   const positionBuffer = gl.createBuffer();
   const vao = gl.createVertexArray();
@@ -119,19 +115,10 @@ const colour = [Math.random(), Math.random(), Math.random(), 1];
       translation = [x, y];
     }
     {
-      angle += 1;
-      if (angle >= 360) angle = 0;
-      const radians = (angle * Math.PI) / 180;
-      rotation = [Math.cos(radians), Math.sin(radians)];
-      scale = [Math.sin(radians), Math.cos(radians)];
-    }
-    {
-      // let [x, y] = scale;
-      // x -= 0.01;
-      // y -= 0.01;
-      // if (x <= 0) x = 1;
-      // if (y <= 0) y = 1;
-      // scale = [x, y];
+      degrees += 1;
+      if (degrees >= 360) degrees = 0;
+      angle = (degrees * Math.PI) / 180;
+      scaling = [Math.sin(angle), Math.cos(angle)];
     }
 
     drawScene(
@@ -142,11 +129,9 @@ const colour = [Math.random(), Math.random(), Math.random(), 1];
       {
         resolutionLocation,
         colourLocation,
-        translationLocation,
-        rotationLocation,
-        scaledLocation
+        matrixLocation
       },
-      { translation, rotation, scale, width, height, colour }
+      { translation, scaling, width, height, colour }
     );
   }, 10);
 })();
