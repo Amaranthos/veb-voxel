@@ -50,14 +50,11 @@ const drawScene = (
 
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  const origin = m3.translation(-width / 2, -height / 2);
-  const translate = m3.translation(...translation);
-  const rotate = m3.rotation(angle);
-  const scale = m3.scaling(...scaling);
-
-  let matrix = m3.multiply(translate, rotate);
-  matrix = m3.multiply(matrix, scale);
-  matrix = m3.multiply(matrix, origin);
+  let matrix = m3.projection(gl.canvas.clientWidth, gl.canvas.clientHeight);
+  matrix = m3.translate(matrix, -width / 2, -height / 2);
+  matrix = m3.translate(matrix, ...translation);
+  matrix = m3.rotate(matrix, angle);
+  matrix = m3.scale(matrix, ...scaling);
 
   gl.uniformMatrix3fv(matrixLocation, false, matrix);
 
@@ -65,8 +62,6 @@ const drawScene = (
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 };
-
-// main
 
 let translation = [0, 0];
 let degrees = 0;

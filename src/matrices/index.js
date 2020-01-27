@@ -1,12 +1,37 @@
+// prettier-ignore
 export const m3 = {
-  identity: () => [1, 0, 0, 0, 1, 0, 0, 0, 1],
-  translation: (tx, ty) => [1, 0, 0, 0, 1, 0, tx, ty, 1],
+  identity: () => [
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
+  ],
+  translation: (tx, ty) => [
+    1, 0, 0,
+    0, 1, 0,
+    tx, ty, 1
+  ],
+  translate: (m, tx, ty) => m3.multiply(m, m3.translation(tx, ty)),
   rotation: radians => {
     const c = Math.cos(radians);
     const s = Math.sin(radians);
-    return [c, -s, 0, s, c, 0, 0, 0, 1];
+    return [
+      c, -s, 0,
+      s, c, 0,
+      0, 0, 1
+    ];
   },
-  scaling: (sx, sy) => [sx, 0, 0, 0, sy, 0, 0, 0, 1],
+  rotate: (m, radians) => m3.multiply(m, m3.rotation(radians)),
+  scaling: (sx, sy) => [
+    sx, 0, 0,
+    0, sy, 0,
+    0, 0, 1
+  ],
+  scale: (m, sx, sy) => m3.multiply(m, m3.scaling(sx, sy)),
+  projection: (width, height) => [
+    2 / width, 0, 0,
+    0, -2 / height,
+    0, -1, 1, 1
+  ],
   multiply: (a, b) => {
     const a00 = a[0 * 3 + 0];
     const a01 = a[0 * 3 + 1];
