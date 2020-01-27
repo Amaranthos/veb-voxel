@@ -1,11 +1,11 @@
 export const fragment = `# version 300 es
 precision mediump float;
 
-uniform vec4 u_colour;
+in vec4 v_colour;
 
 out vec4 outColour;
 
 void main() {
-	outColour = u_colour;
+	outColour = v_colour;
 }
 `;
