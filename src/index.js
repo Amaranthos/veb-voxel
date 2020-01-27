@@ -32,11 +32,15 @@ const drawScene = (
   program,
   vao,
   positionBuffer,
-  { resolutionLocation, colourLocation, translationLocation, rotationLocation },
-  { translation, rotation, width, height, colour }
+  {
+    resolutionLocation,
+    colourLocation,
+    translationLocation,
+    rotationLocation,
+    scaledLocation
+  },
+  { translation, rotation, scale, width, height, colour }
 ) => {
-  // console.log(translation, rotation, width, height, colour);
-
   resizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 0);
@@ -55,8 +59,11 @@ const drawScene = (
 
   gl.uniform2fv(translationLocation, translation);
 
-  // console.log(rotationLocation, rotation);
   gl.uniform2fv(rotationLocation, rotation);
+
+  gl.uniform2fv(scaledLocation, scale);
+
+  // gl.uniform2fv(scaledLocation, scale);
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 };
@@ -66,6 +73,7 @@ const drawScene = (
 let translation = [0, 0];
 let rotation = [0, 1];
 let angle = 0;
+let scale = [1, 1];
 const width = 100;
 const height = 30;
 const colour = [Math.random(), Math.random(), Math.random(), 1];
@@ -86,6 +94,7 @@ const colour = [Math.random(), Math.random(), Math.random(), 1];
   const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
   const translationLocation = gl.getUniformLocation(program, "u_translation");
   const rotationLocation = gl.getUniformLocation(program, "u_rotation");
+  const scaledLocation = gl.getUniformLocation(program, "u_scale");
 
   const positionBuffer = gl.createBuffer();
   const vao = gl.createVertexArray();
@@ -108,11 +117,21 @@ const colour = [Math.random(), Math.random(), Math.random(), 1];
       if (y >= gl.canvas.height) y = 0;
 
       translation = [x, y];
-
+    }
+    {
       angle += 1;
       if (angle >= 360) angle = 0;
       const radians = (angle * Math.PI) / 180;
       rotation = [Math.cos(radians), Math.sin(radians)];
+      scale = [Math.sin(radians), Math.cos(radians)];
+    }
+    {
+      // let [x, y] = scale;
+      // x -= 0.01;
+      // y -= 0.01;
+      // if (x <= 0) x = 1;
+      // if (y <= 0) y = 1;
+      // scale = [x, y];
     }
 
     drawScene(
@@ -124,9 +143,10 @@ const colour = [Math.random(), Math.random(), Math.random(), 1];
         resolutionLocation,
         colourLocation,
         translationLocation,
-        rotationLocation
+        rotationLocation,
+        scaledLocation
       },
-      { translation, rotation, width, height, colour }
+      { translation, rotation, scale, width, height, colour }
     );
   }, 10);
 })();
