@@ -1,7 +1,4 @@
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
-.pnp.*
+.firebase/
 
 # Logs
 logs
