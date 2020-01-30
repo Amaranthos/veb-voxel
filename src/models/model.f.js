@@ -1,6 +1,8 @@
 // prettier-ignore
 export const f = {
+   triangles: 6 * 16,
    model: new Float32Array([
+      // FRONT
       0,   0,   0,
       0, 150,   0,
       30,   0,   0,
@@ -22,6 +24,7 @@ export const f = {
       67,  90,   0,
       67,  60,   0,
 
+      // FRONT
       0,   0,  30,
       30,   0,  30,
       0, 150,  30,
@@ -43,6 +46,7 @@ export const f = {
       67,  60,  30,
       67,  90,  30,
 
+      // TOP
       0,   0,   0,
       100,   0,   0,
       100,   0,  30,

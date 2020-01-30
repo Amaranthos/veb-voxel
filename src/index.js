@@ -67,7 +67,7 @@ const drawScene = (
   let matrix = m4.projection(
     gl.canvas.clientWidth,
     gl.canvas.clientHeight,
-    400
+    10000
   );
 
   matrix = m4.translate(matrix, ...translation);
@@ -78,7 +78,7 @@ const drawScene = (
 
   gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
-  gl.drawArrays(gl.TRIANGLES, 0, 6 * (16 + 3 + 3 + 3));
+    f.triangles + u.triangles + c.triangles + k.triangles
 };
 
 let translation = [45, 150, 0];
