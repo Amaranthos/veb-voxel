@@ -70,15 +70,20 @@ const drawScene = (
     10000
   );
 
+  // matrix = m4.translate(matrix, 500, 500, 0);
   matrix = m4.translate(matrix, ...translation);
   matrix = m4.xRotate(matrix, angle);
-  matrix = m4.yRotate(matrix, angle);
+  matrix = m4.yRotate(matrix, -angle);
   matrix = m4.zRotate(matrix, angle);
-  // matrix = m4.scale(matrix, ...scaling);
+  matrix = m4.scale(matrix, ...scaling);
 
   gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
+  gl.drawArrays(
+    gl.TRIANGLES,
+    0,
     f.triangles + u.triangles + c.triangles + k.triangles
+  );
 };
 
 let translation = [45, 150, 0];
@@ -128,8 +133,8 @@ let angle = 0;
     {
       let [x, y] = translation;
 
-      x += 0.5;
-      y += 0.5;
+      x += 1;
+      y += 1;
 
       if (x >= gl.canvas.width) x = 0;
       if (y >= gl.canvas.height) y = 0;
@@ -137,10 +142,10 @@ let angle = 0;
       translation = [x, y, 0];
     }
     {
-      degrees += 1;
+      degrees += 0.5 + Math.random();
       if (degrees >= 360) degrees = 0;
-      angle = (degrees * Math.PI) / 180 / 1.5;
-      scaling = [Math.sin(angle), Math.cos(angle), 1];
+      angle = (degrees * Math.PI) / 180;
+      scaling = [Math.cos(angle), Math.cos(angle), 1];
     }
 
     drawScene(
