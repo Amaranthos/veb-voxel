@@ -181,5 +181,16 @@ export const m4 = {
       b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
       b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33
     ];
+  },
+  perspective: (fov, aspect, near, far) => {
+    const f = Math.tan(Math.PI * 0.5 - 0.5 * fov);
+    const rangeInverse = 1.0 / (near - far);
+
+    return [
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (near + far) * rangeInverse, -1,
+      0, 0, near * far * rangeInverse * 2, 0
+    ]
   }
 };

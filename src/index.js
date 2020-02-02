@@ -51,7 +51,7 @@ const drawScene = (
   vao,
   positionBuffer,
   { matrixLocation },
-  { translation, scaling }
+  { translation, scaling, angle }
 ) => {
   resizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
@@ -64,13 +64,13 @@ const drawScene = (
 
   gl.bindVertexArray(vao);
 
-  let matrix = m4.projection(
-    gl.canvas.clientWidth,
-    gl.canvas.clientHeight,
-    10000
+  let matrix = m4.perspective(
+    (90 * Math.PI) / 180,
+    gl.canvas.clientWidth / gl.canvas.clientHeight,
+    1,
+    2000
   );
 
-  // matrix = m4.translate(matrix, 500, 500, 0);
   matrix = m4.translate(matrix, ...translation);
   matrix = m4.xRotate(matrix, angle);
   matrix = m4.yRotate(matrix, -angle);
@@ -86,7 +86,7 @@ const drawScene = (
   );
 };
 
-let translation = [45, 150, 0];
+let translation = [-150, 0, -360];
 let degrees = 0;
 let scaling = [1, 1, 1];
 let angle = 0;
@@ -131,21 +131,21 @@ let angle = 0;
 
   setInterval(() => {
     {
-      let [x, y] = translation;
+      let [x, y, z] = translation;
 
-      x += 1;
-      y += 1;
+      // x += 1;
+      // y += 1;
 
       if (x >= gl.canvas.width) x = 0;
       if (y >= gl.canvas.height) y = 0;
 
-      translation = [x, y, 0];
+      translation = [x, y, z];
     }
     {
-      degrees += 0.5 + Math.random();
+      // degrees += 0.5 + Math.random();
       if (degrees >= 360) degrees = 0;
       angle = (degrees * Math.PI) / 180;
-      scaling = [Math.cos(angle), Math.cos(angle), 1];
+      // scaling = [Math.cos(angle), Math.cos(angle), 1];
     }
 
     drawScene(
@@ -156,7 +156,7 @@ let angle = 0;
       {
         matrixLocation
       },
-      { translation, scaling }
+      { translation, scaling, angle }
     );
   }, 10);
 })();
