@@ -35,7 +35,8 @@ const setGeometry = gl => {
   let mat = m4.xRotation(Math.PI);
   mat = m4.translate(mat, -50, -75, -15);
 
-  const positions = [...f.model, ...u.model, ...c.model, ...k.model];
+  // const positions = [...f.model, ...u.model, ...c.model, ...k.model];
+  const positions = [...f.model];
   for (let ii = 0; ii < positions.length; ii += 3) {
     const vector = m4.transformVector(mat, [
       positions[ii + 0],
@@ -49,15 +50,14 @@ const setGeometry = gl => {
     positions[ii + 2] = vector[2];
   }
 
-  console.log(positions);
-
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 };
 
 const setColours = gl => {
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    new Int8Array([...f.colours, ...u.colours, ...c.colours, ...k.colours]),
+    // new Int8Array([...f.colours, ...u.colours, ...c.colours, ...k.colours]),
+    new Int8Array([...f.colours]),
     gl.STATIC_DRAW
   );
 };
@@ -71,27 +71,55 @@ const predrawAndClear = gl => {
   gl.enable(gl.DEPTH_TEST);
 };
 
-const drawScene = (
-  gl,
-  program,
-  vao,
-  positionBuffer,
-  { matrixLocation },
-  { translation, scaling, angle }
-) => {
+const initializeCanvas = () => {
+  const canvas = document.getElementById("render");
+  const gl = canvas.getContext("webgl2");
+  if (!gl) {
+    console.error("No webgl 2");
+  }
+  return gl;
+};
+
+// GL
+let gl;
+let program;
+let vao;
+let positionBuffer;
+let matrixLocation;
+
+// Data
+let previousTime = 0;
+// let degrees = 0;
+let translation = [-150, 0, -360];
+let scaling = [1, 1, 1];
+let rotation = [0, 0, 0];
+// let angle = 0;
+let cameraAngleDeg = 0;
+let rotationSpeed = 1.2;
+
+const drawScene = currentTime => {
   predrawAndClear(gl);
   gl.useProgram(program);
   gl.bindVertexArray(vao);
+
+  const deltaTime = (currentTime - previousTime) * 0.001;
+  previousTime = currentTime;
+
+  // Animation
+  {
+    rotation[1] += rotationSpeed * deltaTime;
+    console.log(rotation);
+  }
 
   const fieldOfView = degToRad(60);
   const aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const [near, far] = [1, 2000];
   let projectionMatrix = m4.perspective(fieldOfView, aspectRatio, near, far);
-  // projectionMatrix = m4.translate(projectionMatrix, ...translation);
-  // projectionMatrix = m4.xRotate(projectionMatrix, angle);
-  // projectionMatrix = m4.yRotate(projectionMatrix, -angle);
-  // projectionMatrix = m4.zRotate(projectionMatrix, angle);
-  // projectionMatrix = m4.scale(projectionMatrix, ...scaling);
+  projectionMatrix = m4.translate(projectionMatrix, ...translation);
+  projectionMatrix = m4.xRotate(projectionMatrix, rotation[0]);
+  projectionMatrix = m4.yRotate(projectionMatrix, rotation[1]);
+  projectionMatrix = m4.zRotate(projectionMatrix, rotation[2]);
+  projectionMatrix = m4.scale(projectionMatrix, ...scaling);
 
   const cameraAngle = degToRad(cameraAngleDeg);
   const radius = 200;
@@ -117,39 +145,28 @@ const drawScene = (
     gl.drawArrays(
       gl.TRIANGLES,
       0,
-      f.triangles + u.triangles + c.triangles + k.triangles
+      f.triangles
+      // f.triangles + u.triangles + c.triangles + k.triangles
     );
   }
+
+  requestAnimationFrame(drawScene);
 };
 
-const initializeCanvas = () => {
-  const canvas = document.getElementById("render");
-  const gl = canvas.getContext("webgl2");
-  if (!gl) {
-    console.error("No webgl 2");
-  }
-  return gl;
-};
-
-let translation = [-150, 0, -360];
-let degrees = 0;
-let scaling = [1, 1, 1];
-let angle = 0;
-let cameraAngleDeg = 0;
 (() => {
-  const gl = initializeCanvas();
+  gl = initializeCanvas();
 
   const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertex);
   const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragment);
-  const program = createProgram(gl, vertexShader, fragmentShader);
+  program = createProgram(gl, vertexShader, fragmentShader);
 
   const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
   const colourAttributeLocation = gl.getAttribLocation(program, "a_colour");
-  const matrixLocation = gl.getUniformLocation(program, "u_matrix");
+  matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
   // Position data
-  const positionBuffer = gl.createBuffer();
-  const vao = gl.createVertexArray();
+  positionBuffer = gl.createBuffer();
+  vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
   gl.enableVertexAttribArray(positionAttributeLocation);
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -169,47 +186,24 @@ let cameraAngleDeg = 0;
     0,
     0
   );
-
-  // drawScene(
-  //   gl,
-  //   program,
-  //   vao,
-  //   positionBuffer,
-  //   {
-  //     matrixLocation
-  //   },
-  //   { translation, scaling, angle }
-  // );
-
-  setInterval(() => {
-    {
-      cameraAngleDeg += 0.5;
-      if (cameraAngleDeg >= 360) {
-        cameraAngleDeg = 0;
-      }
-
-      // let [x, y, z] = translation;
-      // x += 1;
-      // y += 1;
-      // if (x >= gl.canvas.width) x = 0;
-      // if (y >= gl.canvas.height) y = 0;
-      // translation = [x, y, z];
-
-      // degrees += 0.5 + Math.random();
-      // if (degrees >= 360) degrees = 0;
-      // angle = (degrees * Math.PI) / 180;
-      // scaling = [Math.cos(angle), Math.cos(angle), 1];
-    }
-
-    drawScene(
-      gl,
-      program,
-      vao,
-      positionBuffer,
-      {
-        matrixLocation
-      },
-      { translation, scaling, angle }
-    );
-  }, 10);
+  requestAnimationFrame(drawScene);
 })();
+
+// {
+//   cameraAngleDeg += 0.5;
+//   if (cameraAngleDeg >= 360) {
+//     cameraAngleDeg = 0;
+//   }
+
+//   let [x, y, z] = translation;
+//   x += 1;
+//   y += 1;
+//   if (x >= gl.canvas.width) x = 0;
+//   if (y >= gl.canvas.height) y = 0;
+//   translation = [x, y, z];
+
+//   degrees += 0.5 + Math.random();
+//   if (degrees >= 360) degrees = 0;
+//   angle = (degrees * Math.PI) / 180;
+//   scaling = [Math.cos(angle), Math.cos(angle), 1];
+// }
