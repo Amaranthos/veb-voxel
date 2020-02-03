@@ -5,11 +5,21 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html",
+    "test:watch": "jest --watchAll"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/preset-env": "^7.8.4",
+    "babel-jest": "^25.1.0",
     "babel-types": "^6.26.0",
     "eslint": "^6.8.0",
+    "jest": "^25.1.0",
     "parcel-bundler": "^1.12.4"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
   }
 }
