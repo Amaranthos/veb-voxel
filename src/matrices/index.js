@@ -115,7 +115,13 @@ export const m4 = {
     const s = Math.sin(radians);
     return [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   },
-  scaling: (sx, sy, sz) => [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1],
+  // prettier-ignore
+  scaling: (sx, sy, sz) => [
+    sx, 0, 0, 0,
+    0, sy, 0, 0,
+    0, 0, sz, 0,
+    0, 0, 0, 1
+  ],
   projection: (width, height, depth) => [
     2 / width,
     0,

@@ -10,10 +10,11 @@ export const createShader = (gl, type, source) => {
   gl.deleteShader(shader);
 };
 
-export const createProgram = (gl, vertexShader, fragmentShader) => {
+const createProgram = (gl, ...shaders) => {
   var program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
+  shaders.forEach(shader => {
+    gl.attachShader(program, shader);
+  });
   gl.linkProgram(program);
   const success = gl.getProgramParameter(program, gl.LINK_STATUS);
 
@@ -21,4 +22,10 @@ export const createProgram = (gl, vertexShader, fragmentShader) => {
 
   console.error(gl.getProgramInfoLog(program));
   gl.deleteProgram(program);
+};
+
+export const createDefaultProgram = (gl, vertexSource, fragmentSource) => {
+  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
+  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+  return createProgram(gl, vertexShader, fragmentShader);
 };
