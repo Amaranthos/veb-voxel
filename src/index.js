@@ -4,17 +4,10 @@ import { cube } from "./models";
 
 import { wgl, Gameobject } from "./wgl";
 
-import noodles from "../assets/noodles.jpg";
+import grass from "../assets/grass.png";
 
 import { random } from "./random";
-
-const setGeometry = gl => {
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube.model), gl.STATIC_DRAW);
-};
-
-const setTexcoords = gl => {
-  gl.bufferData(gl.ARRAY_BUFFER, cube.uvs, gl.STATIC_DRAW);
-};
+import { degToRad } from "./angles";
 
 const loadTexture = (gl, source) => {
   const texture = gl.createTexture();
@@ -43,61 +36,47 @@ const loadTexture = (gl, source) => {
   return texture;
 };
 
-// GL
-let vao;
-
 // Data
 let previousTime = 0;
-
 let gos;
 
 const drawScene = currentTime => {
   const deltaTime = (currentTime - previousTime) * 0.001;
   previousTime = currentTime;
 
-  // Animation
-
   gos.forEach((go, i) => {
-    go.rotation.x += Math.sin(i) * 0.4 * deltaTime;
-    go.rotation.y += Math.sin(i) * 0.7 * deltaTime;
-    go.rotation.z += Math.sin(i) * -0.8 * deltaTime;
+    // go.rotation.x += 0.4 * (i + 1) * 0.5 * deltaTime;
+    // go.rotation.y += 0.7 * (i + 1) * 0.5 * deltaTime;
+    // go.rotation.z += -0.8 * (i + 1) * 0.5 * deltaTime;
   });
 
-  wgl.draw(vao, ...gos);
+  wgl.draw(...gos);
   requestAnimationFrame(drawScene);
 };
 
 (() => {
   const { gl } = wgl;
 
-  const program = createDefaultProgram(gl, vertex, fragment);
-  wgl.setShaderProgram(program);
-  wgl.createUniforms();
+  console.log(gl);
+  // wgl.setShaderProgram(program);
+  // wgl.createUniforms();
 
-  const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-  const texcoordAttributeLocation = gl.getAttribLocation(program, "a_texcoord");
+  const texture = loadTexture(gl, grass);
 
-  // Position data
-  const positionBuffer = gl.createBuffer();
-  vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-  gl.enableVertexAttribArray(positionAttributeLocation);
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  setGeometry(gl);
-  gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
-
-  const texcoordBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-  setTexcoords(gl);
-
-  gl.enableVertexAttribArray(texcoordAttributeLocation);
-  gl.vertexAttribPointer(texcoordAttributeLocation, 2, gl.FLOAT, true, 0, 0);
-
-  const texture = loadTexture(gl, noodles);
-
-  gos = Array(5)
+  const count = 5;
+  gos = Array(count)
     .fill(new Gameobject(cube))
-    .map(() => new Gameobject(cube));
+    .map((e, i) => {
+      const go = new Gameobject(cube);
+
+      var angle = (i * Math.PI * 2) / count - degToRad(90);
+      var x = Math.cos(angle) * 1.5;
+      var y = Math.sin(angle) * 1.5;
+
+      go.position = [x, y, 0];
+
+      return go;
+    });
 
   console.log(gos);
 

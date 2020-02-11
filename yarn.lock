@@ -175,6 +175,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/helper-create-class-features-plugin@npm:^7.8.3":
+  version: 7.8.3
+  resolution: "@babel/helper-create-class-features-plugin@npm:7.8.3"
+  dependencies:
+    "@babel/helper-function-name": ^7.8.3
+    "@babel/helper-member-expression-to-functions": ^7.8.3
+    "@babel/helper-optimise-call-expression": ^7.8.3
+    "@babel/helper-plugin-utils": ^7.8.3
+    "@babel/helper-replace-supers": ^7.8.3
+    "@babel/helper-split-export-declaration": ^7.8.3
+  peerDependencies:
+    "@babel/core": ^7.0.0
+  checksum: 4689f0216771e1be94c78dc8bfa567bdbedf3f6598907f6833b6ead03e81aa59ee7b3089668dd437dccad077c8d7e2c02a98c4c13f7cf003f92cf7981f7b6550
+  languageName: node
+  linkType: hard
+
 "@babel/helper-create-regexp-features-plugin@npm:^7.8.3":
   version: 7.8.3
   resolution: "@babel/helper-create-regexp-features-plugin@npm:7.8.3"
@@ -414,6 +430,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/plugin-proposal-class-properties@npm:^7.8.3":
+  version: 7.8.3
+  resolution: "@babel/plugin-proposal-class-properties@npm:7.8.3"
+  dependencies:
+    "@babel/helper-create-class-features-plugin": ^7.8.3
+    "@babel/helper-plugin-utils": ^7.8.3
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: bd93058313b92344107b644b89066a4346673d6d75fa5174433280af8d10b4f7618de37a04bfa920c5d54450e639bfb7f7af8d4276512fcd7e96e205445b2ff7
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-proposal-dynamic-import@npm:^7.8.3":
   version: 7.8.3
   resolution: "@babel/plugin-proposal-dynamic-import@npm:7.8.3"
@@ -483,6 +511,18 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0-0
   checksum: c8eaa9659b076dc4985098ec472622056fbba9036066c963b2a65f81014647c2e56e3e43eeb4657cb6078f9d28c28c84714286816cfab5b1af3eaa95542c3c5d
+  languageName: node
+  linkType: hard
+
+"@babel/plugin-proposal-private-methods@npm:^7.8.3":
+  version: 7.8.3
+  resolution: "@babel/plugin-proposal-private-methods@npm:7.8.3"
+  dependencies:
+    "@babel/helper-create-class-features-plugin": ^7.8.3
+    "@babel/helper-plugin-utils": ^7.8.3
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: badf0c2eae386488771dfc8e54eeadbf5a1183970cc0fcb40dc0028e45df790ac8919616501a16d80bf8e4bd024d6388aeaae4a74ba68096f71cfc6781fb30c4
   languageName: node
   linkType: hard
 
@@ -9535,6 +9575,8 @@ resolve@1.1.7:
   resolution: "web-voxel@workspace:."
   dependencies:
     "@babel/core": ^7.8.4
+    "@babel/plugin-proposal-class-properties": ^7.8.3
+    "@babel/plugin-proposal-private-methods": ^7.8.3
     "@babel/preset-env": ^7.8.4
     babel-jest: ^25.1.0
     babel-types: ^6.26.0
