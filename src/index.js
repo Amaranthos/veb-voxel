@@ -2,12 +2,13 @@ import { vertex, fragment, createDefaultProgram } from "./shaders/";
 import { m4 } from "./matrices";
 import { cube } from "./models";
 
-import { wgl, Gameobject } from "./wgl";
+import { wgl, Gameobject, Vec3 } from "./wgl";
 
 import grass from "../assets/grass.png";
 
 import { random } from "./random";
 import { degToRad } from "./angles";
+import { Renderable } from "./wgl/renderable";
 
 const loadTexture = (gl, source) => {
   const texture = gl.createTexture();
@@ -39,46 +40,58 @@ const loadTexture = (gl, source) => {
 // Data
 let previousTime = 0;
 let gos;
+let cubeRenderable;
 
 const drawScene = currentTime => {
+  const { predrawAndClear } = wgl;
+  predrawAndClear();
+
   const deltaTime = (currentTime - previousTime) * 0.001;
   previousTime = currentTime;
 
   gos.forEach((go, i) => {
-    // go.rotation.x += 0.4 * (i + 1) * 0.5 * deltaTime;
-    // go.rotation.y += 0.7 * (i + 1) * 0.5 * deltaTime;
-    // go.rotation.z += -0.8 * (i + 1) * 0.5 * deltaTime;
+    go.rotation.x += 0.4 * ((i % 3) + 1.5) * 0.5 * deltaTime;
+    go.rotation.y += 0.7 * ((i % 3) + 1.5) * 0.5 * deltaTime;
+    go.rotation.z += -0.8 * ((i % 3) + 1.5) * 0.5 * deltaTime;
   });
 
-  wgl.draw(...gos);
+  cubeRenderable.draw(gos);
+  cubeRenderable.render();
+
   requestAnimationFrame(drawScene);
 };
 
 (() => {
-  const { gl } = wgl;
-
-  console.log(gl);
-  // wgl.setShaderProgram(program);
-  // wgl.createUniforms();
+  const { gl, shaderProgram } = wgl;
 
   const texture = loadTexture(gl, grass);
 
-  const count = 5;
+  const count = 6;
   gos = Array(count)
     .fill(new Gameobject(cube))
     .map((e, i) => {
       const go = new Gameobject(cube);
 
-      var angle = (i * Math.PI * 2) / count - degToRad(90);
-      var x = Math.cos(angle) * 1.5;
-      var y = Math.sin(angle) * 1.5;
+      var angle = (i * Math.PI * 2) / count + degToRad(90);
+      var x = Math.cos(angle) * 1.75;
+      var y = Math.sin(angle) * 1.75;
 
       go.position = [x, y, 0];
 
       return go;
     });
 
-  console.log(gos);
+  // Top
+  gos[0].rotation = new Vec3(degToRad(-90), 0, 0);
+  // Bottom
+  gos[3].rotation = new Vec3(degToRad(90), 0, 0);
+  //Sides
+  gos[1].rotation = new Vec3(0, 0, 0);
+  gos[2].rotation = new Vec3(0, degToRad(90), 0);
+  gos[4].rotation = new Vec3(0, degToRad(180), 0);
+  gos[5].rotation = new Vec3(0, degToRad(-90), 0);
+
+  cubeRenderable = new Renderable(gl, shaderProgram, cube);
 
   requestAnimationFrame(drawScene);
 })();

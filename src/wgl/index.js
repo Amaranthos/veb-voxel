@@ -48,7 +48,7 @@ class Wgl {
 
     this.#gl.bufferData(
       this.#gl.ARRAY_BUFFER,
-      new Float32Array(cube.model),
+      new Float32Array(cube.mesh),
       this.#gl.STATIC_DRAW
     );
 
@@ -74,6 +74,10 @@ class Wgl {
 
   get gl() {
     return this.#gl;
+  }
+
+  get shaderProgram() {
+    return this.#shaderProgram;
   }
 
   resizeCanvas = canvas => {
@@ -113,7 +117,7 @@ class Wgl {
       2000
     );
 
-    const cameraMatrix = m4.lookAt([0, 0, -5], [0, 0, 0], [0, -1, 0]);
+    const cameraMatrix = m4.lookAt([0, 0, -7], [0, 0, 0], [0, 1, 0]);
     const viewMatrix = m4.inverse(cameraMatrix);
     const viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
@@ -149,7 +153,7 @@ export class Gameobject {
   }
 }
 
-class Vec3 {
+export class Vec3 {
   constructor(x, y, z) {
     this.x = x;
     this.y = y;
